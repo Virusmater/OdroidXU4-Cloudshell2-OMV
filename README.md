@@ -94,6 +94,7 @@ sudo wget -P /boot https://raw.githubusercontent.com/Virusmater/OdroidXU4-Clouds
 ```
 
 # Tests
+Everything seem to work fine, but upload to network share is significantly lower than download
 ## Lan Network
 ```bash
 desktop:~/iso$ iperf3 -c odroid.lan
@@ -145,8 +146,8 @@ kompot@odroid:/srv/dev-disk-by-label-data$ dd if=output.img of=/dev/null bs=8k c
 2147483648 bytes (2.1 GB, 2.0 GiB) copied, 19.2938 s, 111 MB/s
 ```
 ## Network share
-### wifi:
-#### UAS:
+### wifi
+#### UAS
 ```bash
 #download smb - 42.70MB/s
 desktop:~/iso$ rsync --info=progress2 /mnt/smb/tmp.img  .
@@ -161,7 +162,7 @@ desktop:~/iso$ rsync --info=progress2 /mnt/nfs/tmp.img  .
 desktop:~/iso$ rsync --info=progress2 tmp.img  /mnt/nfs
 1,182,793,728 100%   42.30MB/s    0:00:26 (xfr#1, to-chk=0/1)
 ```
-#### usb-storage:
+#### usb-storage
 ```bash
 #Upload smb - 43.07MB/s
 kompot@kompot-ThinkPad-T480s:~/iso$ rsync --info=progress2 tmp.img  /mnt/smb/
