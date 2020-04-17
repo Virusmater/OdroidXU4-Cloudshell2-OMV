@@ -51,7 +51,20 @@ Reading state information... Done
 The following additional packages will be installed:
   i2c-tools libi2c0
 ```
+change the interface name from eth* to enx*
+```bash
+kompot@odroidxu4:~$ sed -i 's/\/eth/\/enx/g' /bin/cloudshell-lcd 
+```
 reboot to see the result
 
 ## Fan speed
-The fan cannot be adjusted by a software because of the mistake in the Cloudshell board, so make a cron script to be able to live in the same room with your NAS:
+The fan cannot be adjusted by a software because of the mistake in the Cloudshell board, so make a cron script to be able to live in the same room with your NAS. Always check downloaded script content before the execution.
+```bash
+wget -P /usr/local/sbin/ https://raw.githubusercontent.com/Virusmater/OdroidXU4-Cloudshell2-OMV/master/usr/local/sbin/fan_control.sh
+chmod +x /usr/local/sbin/fan_control.sh
+```
+Add task to cron:
+```bash
+crontab -e
+ * * * * * /usr/local/sbin/fan_control.sh
+```
