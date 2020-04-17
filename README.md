@@ -78,7 +78,7 @@ root@odroidxu4:~# ./chop_smart_info.sh
 Okay
 Okay
 ```
-## UAS vs USB-STORAGE
+### UAS vs USB-STORAGE
 During tests UAS driver failed few times, so one of the main features isn't stabe even now. dmesg:
 ```bash
 [10484.934146] sd 0:0:0:0: [sda] tag#27 uas_eh_abort_handler 0 uas-tag 28 inflight: CMD OUT 
@@ -91,4 +91,128 @@ During tests UAS driver failed few times, so one of the main features isn't stab
 Don't know if this is the problem of XU4, Armbian, Linux, Cloudshell2, HDD or me. Consider using usb-storage driver:
 ```bash
 sudo wget -P /boot https://raw.githubusercontent.com/Virusmater/OdroidXU4-Cloudshell2-OMV/master/boot/armbianEnv.txt
+```
+
+# Tests
+## Lan Network
+```bash
+desktop:~/iso$ iperf3 -c odroid.lan
+Connecting to host odroid.lan, port 5201
+[  5] local 192.168.1.10 port 59886 connected to 192.168.1.20 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  86.4 MBytes   725 Mbits/sec    0    378 KBytes       
+[  5]   1.00-2.00   sec  83.8 MBytes   703 Mbits/sec    0    378 KBytes       
+[  5]   2.00-3.00   sec  87.2 MBytes   731 Mbits/sec    0    378 KBytes       
+[  5]   3.00-4.00   sec  87.2 MBytes   731 Mbits/sec    0    378 KBytes       
+[  5]   4.00-5.00   sec  87.2 MBytes   732 Mbits/sec    0    378 KBytes       
+[  5]   5.00-6.00   sec  81.7 MBytes   685 Mbits/sec    0    421 KBytes       
+[  5]   6.00-7.00   sec  87.7 MBytes   735 Mbits/sec    0    421 KBytes       
+[  5]   7.00-8.00   sec  86.9 MBytes   729 Mbits/sec    0    421 KBytes       
+[  5]   8.00-9.00   sec  85.8 MBytes   719 Mbits/sec    0    421 KBytes       
+[  5]   9.00-10.00  sec  88.4 MBytes   741 Mbits/sec    0    421 KBytes       
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec   862 MBytes   723 Mbits/sec    0             sender
+[  5]   0.00-10.00  sec   860 MBytes   722 Mbits/sec                  receiver
+
+iperf Done.
+```
+## Storage
+### UAS
+```bash
+#Write - 116 MB/s
+root@odroid:/srv/dev-disk-by-label-data# dd if=/dev/zero of=output.img bs=8k count=256k
+262144+0 records in
+262144+0 records out
+2147483648 bytes (2.1 GB, 2.0 GiB) copied, 18.4498 s, 116 MB/s
+#Read - 143 MB/s
+root@odroid:/srv# dd if=dev-disk-by-label-data/output.img of=/dev/null bs=8k count=256k
+262144+0 records in
+262144+0 records out
+2147483648 bytes (2.1 GB, 2.0 GiB) copied, 15.0103 s, 143 MB/s
+```
+### USB-STORAGE
+```bash
+#write - 94 MB/s
+kompot@odroid:/srv/dev-disk-by-label-data$ dd if=/dev/zero of=output.img bs=8k count=256k
+262144+0 records in
+262144+0 records out
+2147483648 bytes (2.1 GB, 2.0 GiB) copied, 22.8336 s, 94.0 MB/s
+#read - 111 MB/s
+kompot@odroid:/srv/dev-disk-by-label-data$ dd if=output.img of=/dev/null bs=8k count=256k
+262144+0 records in
+262144+0 records out
+2147483648 bytes (2.1 GB, 2.0 GiB) copied, 19.2938 s, 111 MB/s
+```
+## Network share
+### wifi:
+#### UAS:
+```bash
+#download smb - 42.70MB/s
+desktop:~/iso$ rsync --info=progress2 /mnt/smb/tmp.img  .
+1,182,793,728 100%   42.70MB/s    0:00:26 (xfr#1, to-chk=0/1)
+#upload smb - 42.74MB/s
+desktop:~/iso$ rsync --info=progress2 tmp.img  /mnt/smb/
+1,182,793,728 100%   42.74MB/s    0:00:26 (xfr#1, to-chk=0/1)
+#download nfs - 43.18MB/s
+desktop:~/iso$ rsync --info=progress2 /mnt/nfs/tmp.img  .
+1,182,793,728 100%   43.18MB/s    0:00:26 (xfr#1, to-chk=0/1)
+#upload nfs - 42.30MB/s
+desktop:~/iso$ rsync --info=progress2 tmp.img  /mnt/nfs
+1,182,793,728 100%   42.30MB/s    0:00:26 (xfr#1, to-chk=0/1)
+```
+#### usb-storage:
+```bash
+#Upload smb - 43.07MB/s
+kompot@kompot-ThinkPad-T480s:~/iso$ rsync --info=progress2 tmp.img  /mnt/smb/
+1,182,793,728 100%   43.07MB/s    0:00:26 (xfr#1, to-chk=0/1)
+
+#dowload smb - 43.54MB/s
+kompot@kompot-ThinkPad-T480s:~/iso$ rsync --info=progress2 /mnt/smb/tmp.img .
+1,182,793,728 100%   43.54MB/s    0:00:25 (xfr#1, to-chk=0/1)
+
+#download nfs - 44.80MB/s
+kompot@kompot-ThinkPad-T480s:~/iso$ rsync --info=progress2 /mnt/nfs/tmp.img .
+1,182,793,728 100%   44.80MB/s    0:00:25 (xfr#1, to-chk=0/1)
+
+#upload nfs - 42.28MB/s
+kompot@kompot-ThinkPad-T480s:~/iso$ rsync --info=progress2 tmp.img /mnt/nfs/
+1,182,793,728 100%   42.28MB/s    0:00:26 (xfr#1, to-chk=0/1)
+```
+
+### ethernet
+#### UAS
+```bash
+#upload nfs - 65.55MB/s  
+desktop:~/iso$ rsync --info=progress2 tmp.img  /mnt/nfs
+1,182,793,728 100%   65.55MB/s    0:00:17 (xfr#1, to-chk=0/1)
+
+#download nfs - 108.06MB/s
+desktop:~/iso$ rsync --info=progress2 /mnt/nfs/tmp.img  .
+1,182,793,728 100%  108.06MB/s    0:00:10 (xfr#1, to-chk=0/1)
+
+#upload smb - 67.48MB/s
+desktop:~/iso$ rsync --info=progress2 tmp.img  /mnt/mountpoint/
+1,182,793,728 100%   67.48MB/s    0:00:16 (xfr#1, to-chk=0/1)
+
+#download smb:
+# here UAS failed me another time and I decided to go with usb-storage
+```
+#### usb-storage
+```bash
+#upload smb - 59.55MB/s
+desktop:~/iso$ rsync --info=progress2 tmp.img  /mnt/mountpoint/
+1,182,793,728 100%   59.55MB/s    0:00:18 (xfr#1, to-chk=0/1)
+
+#download smb - 96.57MB/
+desktop:~/iso$ rsync --info=progress2 /mnt/mountpoint/tmp.img  .
+1,182,793,728 100%   96.57MB/s    0:00:11 (xfr#1, to-chk=0/1)
+
+#upload nfs - 67.49MB/s
+desktop:~/iso$ rsync --info=progress2 tmp.img  /mnt/nfs/
+1,182,793,728 100%   67.49MB/s    0:00:16 (xfr#1, to-chk=0/1)
+
+#download nfs - 103.17MB/s
+desktop:~/iso$ rsync --info=progress2 /mnt/nfs/tmp.img  .
+1,182,793,728 100%  103.17MB/s    0:00:10 (xfr#1, to-chk=0/1)
 ```
