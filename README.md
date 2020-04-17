@@ -58,7 +58,7 @@ kompot@odroidxu4:~$ sed -i 's/\/eth/\/enx/g' /bin/cloudshell-lcd
 reboot to see the result
 
 ## Fan speed
-The fan cannot be adjusted by a software because of the mistake in the Cloudshell board, so make a cron script to be able to live in the same room with your NAS. Always check downloaded script content before the execution.
+The fan cannot be adjusted by a software because of the mistake in the Cloudshell2 board, so make a cron script to be able to live in the same room with your NAS. Always check downloaded script content before the execution.
 ```bash
 wget -P /usr/local/sbin/ https://raw.githubusercontent.com/Virusmater/OdroidXU4-Cloudshell2-OMV/master/usr/local/sbin/fan_control.sh
 chmod +x /usr/local/sbin/fan_control.sh
@@ -67,4 +67,28 @@ Add task to cron:
 ```bash
 crontab -e
  * * * * * /usr/local/sbin/fan_control.sh
+```
+## USB2SATA controller hacks
+### S.M.A.R.T. info
+USB2SATA microcontroller used in the Cloudshell2 has few unfixable bugs. During some S.M.A.R.T requests from the OMV WebUI hard drives disappear from the system.
+```bash
+root@odroidxu4:~# wget https://raw.githubusercontent.com/Virusmater/OdroidXU4-Cloudshell2-OMV/master/root/chop_smart_info.sh
+root@odroidxu4:~# chmod +x chop_smart_info.sh 
+root@odroidxu4:~# ./chop_smart_info.sh 
+Okay
+Okay
+```
+## UAS vs USB-STORAGE
+During tests UAS driver failed few times, so one of the main features isn't stabe even now. dmesg:
+```bash
+[10484.934146] sd 0:0:0:0: [sda] tag#27 uas_eh_abort_handler 0 uas-tag 28 inflight: CMD OUT 
+[10484.934157] sd 0:0:0:0: [sda] tag#27 CDB: opcode=0x8a 8a 00 00 00 00 00 01 29 70 18 00 00 04 00 00 00
+[10490.041882] xhci-hcd xhci-hcd.3.auto: xHCI host not responding to stop endpoint command.
+[10490.057895] xhci-hcd xhci-hcd.3.auto: Host halt failed, -110
+[10490.057902] xhci-hcd xhci-hcd.3.auto: xHCI host controller not responding, assume dead
+[10490.058312] xhci-hcd xhci-hcd.3.auto: HC died; cleaning up
+```
+Don't know if this is the problem of XU4, Armbian, Linux, Cloudshell2, HDD or me. Consider using usb-storage driver:
+```bash
+sudo wget -P /boot https://raw.githubusercontent.com/Virusmater/OdroidXU4-Cloudshell2-OMV/master/boot/armbianEnv.txt
 ```
