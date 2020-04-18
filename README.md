@@ -27,7 +27,9 @@ gpg: key 3028C3C96AD57103: public key "Launchpad PPA for KYLE LEE" imported
 gpg: Total number processed: 1
 gpg:               imported: 1
 gpg: no valid OpenPGP data found.
+```
 add key manually
+```bash
 kompot@odroidxu4:~$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3028C3C96AD57103
 Executing: /tmp/apt-key-gpghome.WU8NDps3LZ/gpg.1.sh --keyserver keyserver.ubuntu.com --recv-keys 3028C3C96AD57103
 gpg: key 3028C3C96AD57103: public key "Launchpad PPA for KYLE LEE" imported
