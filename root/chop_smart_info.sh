@@ -2,6 +2,7 @@
 
 SRCPATH1="/usr/share/php/openmediavault/system/storage/smartinformation.inc"
 SRCPATH2="/usr/share/openmediavault/engined/rpc/smart.inc"
+SRCPATH3="/usr/share/php/openmediavault/system/storage/smarttrait.inc"
 
 function chSrc() {
 	
@@ -36,6 +37,7 @@ function chSrc() {
 
 chSrc ${SRCPATH1}
 chSrc ${SRCPATH2}
+chSrc ${SRCPATH3}
 
 if [ ${GOTERROR} ];
 then
