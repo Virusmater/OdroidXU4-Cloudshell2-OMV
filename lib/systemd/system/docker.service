@@ -1,0 +1,2 @@
+# add following lines to your already existing docker.service file to the section [Service]
+ExecStartPre=/usr/local/bin/wait-for-unlock.sh
